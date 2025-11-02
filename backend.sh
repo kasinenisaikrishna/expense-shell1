@@ -60,5 +60,6 @@ curl -o /tmp/backend.zip https://expense-builds.s3.us-east-1.amazonaws.com/expen
 validate $? "downloading backend app code"
 
 cd /app
-unzip /tmp/backend.zip
+rm -rf /app/* #remove the existing code
+unzip /tmp/backend.zip &>>$log_file
 validate $? "extracting backend app code"

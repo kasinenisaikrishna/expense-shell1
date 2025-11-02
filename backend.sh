@@ -34,21 +34,14 @@ echo "script started executing at: $(date)" | tee -a $log_file
 
 check_root
 
-dnf install mysql-server -y &>>$log_file
-validate $? "installing mysql server"
+dnf module disable nodejs -y
+validate $? "disable default node js"
 
-systemctl enable mysqld &>>$log_file
-validate $? "Enabled mysql server"
+dnf module enable nodejs:20 -y
+validate $? "enable nodejs:20"
 
-systemctl start mysqld &>>$log_file
-validate $? "started mysql server"
+dnf install nodejs -y
+validate $? "install nodejs"
 
-mysql -h mysql.dawsconnect.org -u root -pExpenseApp@1 -e 'show databases;' &>>$log_file #to add idempotency
-if [ $? -ne 0 ]
-then
-    echo "mysql root password is not setup, setting now" &>>$log_file
-    mysql_secure_installation --set-root-pass ExpenseApp@1
-    validate $? "setting up root password"
-else
-    echo -e "mysql root password is already setup...$y skipping $n" | tee -a $log_file
-fi
+useradd expense
+validate $? "creating expense user"

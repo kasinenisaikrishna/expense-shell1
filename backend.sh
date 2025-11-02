@@ -43,7 +43,7 @@ validate $? "enable nodejs:20"
 dnf install nodejs -y &>>$log_file
 validate $? "install nodejs"
 
-id expense &>>$log_file
+id expense &>>$log_file #if expense user exists then exit status will be 0 (echo $?) if expense user does not exists exit status will return 1
 if [ $? -ne 0 ]
 then
     echo -e "expense user does not exists... $g creating $n"
@@ -52,3 +52,13 @@ then
 else
     echo -e "expense user already exists... $y skipping $n"
 fi
+
+mkdir -p /app #if app folder is there this step will skip else app folder will be created.
+validate $? "creating /app folder"
+
+curl -o /tmp/backend.zip https://expense-builds.s3.us-east-1.amazonaws.com/expense-backend-v2.zip &>>$log_file
+validate $? "downloading backend app code"
+
+cd /app
+unzip /tmp/backend.zip
+validate $? "extracting backend app code"

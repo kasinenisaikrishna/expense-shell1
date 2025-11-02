@@ -34,14 +34,21 @@ echo "script started executing at: $(date)" | tee -a $log_file
 
 check_root
 
-dnf module disable nodejs -y
+dnf module disable nodejs -y &>>$log_file
 validate $? "disable default node js"
 
-dnf module enable nodejs:20 -y
+dnf module enable nodejs:20 -y &>>$log_file
 validate $? "enable nodejs:20"
 
-dnf install nodejs -y
+dnf install nodejs -y &>>$log_file
 validate $? "install nodejs"
 
-useradd expense
-validate $? "creating expense user"
+id expense &>>$log_file
+if [ $? -ne 0 ]
+then
+    echo -e "expense user does not exists... $g creating $n"
+    useradd expense &>>$log_file
+    validate $? "creating expense user"
+else
+    echo -e "expense user already exists... $y skipping $n"
+fi
